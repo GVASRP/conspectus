@@ -15,6 +15,7 @@ from sqlalchemy import (
     create_engine,
 )
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 Base = declarative_base()
 
@@ -229,7 +230,13 @@ DATABASE_URL = os.getenv("DATABASE_URL", "")
 if DATABASE_URL:
     engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 else:
-    engine = create_engine(f"sqlite:///{DB_PATH}", connect_args={"check_same_thread": False})
+    # Без DATABASE_URL — in-memory sqlite (Vercel: файловая система read-only,
+    # файла на диске создать нельзя). Данные живут до конца процесса.
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
