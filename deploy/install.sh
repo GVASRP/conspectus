@@ -6,10 +6,16 @@ cd "$APP"
 
 log() { echo "[install] $*"; }
 
-log "checking python venv + git"
-if ! python3 -m venv --help >/dev/null 2>&1; then
+log "checking python venv + build deps + git"
+NEED=
+command -v git >/dev/null 2>&1 || NEED="$NEED git"
+if ! python3 -m venv --help >/dev/null 2>&1; then NEED="$NEED python3-venv"; fi
+if [ -n "$NEED" ]; then
   apt-get update -qq
-  apt-get install -y python3-venv git
+  DEBIAN_FRONTEND=noninteractive apt-get install -y $NEED
+fi
+if [ ! -f /usr/include/python3*/Python.h ]; then
+  DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev build-essential
 fi
 
 log "removing caches"
