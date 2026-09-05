@@ -21,7 +21,8 @@ fi
 log "removing caches"
 find . -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
 
-log "creating venv"
+log "creating fresh venv"
+rm -rf .venv
 python3 -m venv .venv
 .venv/bin/python -m pip install --quiet --upgrade pip wheel setuptools
 
