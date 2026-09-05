@@ -324,6 +324,11 @@ def main():
             await bot.set_my_commands(command_enabled)
         except Exception:  # noqa: BLE001 — сеть может быть недоступна при старте
             log.warning("Не удалось установить меню команд, продолжаем без него")
+        if config.ADMIN_TG_ID:
+            try:
+                await bot.send_message(int(config.ADMIN_TG_ID), "✅ Конспекты: бот запущен")
+            except Exception:  # noqa: BLE001
+                log.warning("Не удалось отправить стартовое сообщение админу")
         try:
             await dp.run_polling(bot)
         finally:
