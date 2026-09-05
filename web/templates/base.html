@@ -36,6 +36,10 @@
           <svg class="nic"><use href="/static/icons.svg#i-plus"/></svg>
           Добавить
         </a>
+        <a href="/fun" class="{% if active == 'fun' %}on{% endif %}">
+          <svg class="nic"><use href="/static/icons.svg#i-gamepad"/></svg>
+          Развлечения
+        </a>
         {% if user and user.role == 'admin' %}
         <a href="/admin" class="{% if active == 'admin' %}on{% endif %}">
           <svg class="nic"><use href="/static/icons.svg#i-shield"/></svg>

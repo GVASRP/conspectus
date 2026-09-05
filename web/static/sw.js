@@ -11,6 +11,14 @@ const PRECACHE = [
   '/static/icon-512.png',
   '/static/fonts/inter-cyrillic.woff2',
   '/static/fonts/inter-latin.woff2',
+  '/static/games/games.css',
+  '/static/games/common.js',
+  '/static/games/hub.js',
+  '/static/games/2048.js',
+  '/static/games/snake.js',
+  '/static/games/memory.js',
+  '/static/games/quiz.js',
+  '/static/games/weather.js',
 ];
 
 self.addEventListener('install', (e) => {

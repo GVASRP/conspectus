@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} · Развлечения{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/games/games.css">{% endblock %}
+{% block body %}
+  <header class="ghead reveal in" style="margin-top:40px">
+    <div class="gtitle">
+      <span class="kicker"><span class="dot"></span>Комната развлечений</span>
+      <h1>Перерыв? Залезай!</h1>
+      <p class="gsub">Игры, погода и мелкие радости — всё это твои конспекты между делом.</p>
+    </div>
+    <a class="btn ghost" href="/">
+      <svg class="bic"><use href="/static/icons.svg#i-book"/></svg>
+      К конспектам
+    </a>
+  </header>
+
+  <div class="fun-grid reveal in d1">
+    {% for key, name in games.items() %}
+      {% set meta = {
+        '2048': ['Складывай плитки', '🧮', 'g-g'],
+        'snake': ['Классика на клетках', '🐍', 'g-p'],
+        'memory': ['Найди все пары', '🧠', 'g-r'],
+        'quiz': ['Угадай предмет', '🎯', 'g-w'],
+        'weather': ['Погода на сегодня', '🌦️', 'g-b'],
+      } %}
+      {% set m = meta[key] %}
+      <a class="fun-card {{ m[2] }} s-item" href="/fun/play/{{ key }}">
+        <span class="f-ce">{{ m[1] }}</span>
+        <span class="f-name">{{ name }}</span>
+        <span class="f-desc">{{ m[0] }}</span>
+        <span class="f-go">Играть
+          <svg class="icon" style="width:15px;height:15px"><use href="/static/icons.svg#i-arrow-right"/></svg>
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="shot reveal">
+    <h2>Мелкие радости <span class="snum">4</span></h2>
+  </div>
+
+  <div class="gad-row reveal d1">
+    <div class="gadget">
+      <span class="g-ico">💡</span>
+      <b>Факт дня</b>
+      <p id="fact-text" class="fact">Жми кнопку — узнаешь.</p>
+      <button class="btn xs ghost" id="fact-btn">Другой факт</button>
+    </div>
+
+    <div class="gadget">
+      <span class="g-ico">🎲</span>
+      <b>Кубик</b>
+      <div class="die" id="die">🎲</div>
+      <p class="fact">Кидай на удачу.</p>
+      <button class="btn xs ghost" id="dice-btn">Кинуть</button>
+    </div>
+
+    <div class="gadget">
+      <span class="g-ico">🪙</span>
+      <b>Орёл и решка</b>
+      <div class="coin" id="coin">
+        <div class="coin-in" id="coin-in">
+          <div class="coin-face">🪙</div>
+          <div class="coin-face">⚪</div>
+        </div>
+      </div>
+      <p class="fact" id="coin-res">Счёт: орёл 0 · решка 0</p>
+      <button class="btn xs ghost" id="coin-btn">Бросить</button>
+    </div>
+
+    <div class="gadget">
+      <span class="g-ico">🍅</span>
+      <b>Помодоро</b>
+      <div class="pomo" id="pomo-ring">
+        <span id="pomo-time">25:00</span>
+      </div>
+      <div class="pomo-presets" id="pomo-presets">
+        <button class="btn xs ghost" data-min="25">25</button>
+        <button class="btn xs ghost" data-min="5">5</button>
+        <button class="btn xs ghost" data-min="10">10</button>
+      </div>
+      <button class="btn xs" id="pomo-btn">Старт</button>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="/static/games/hub.js"></script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} · {{ game_name }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/games/games.css">{% endblock %}
+{% block body %}
+  <header class="ghead reveal in">
+    <a class="btn ghost sm" href="/fun">
+      <svg class="bic"><use href="/static/icons.svg#i-arrow-left"/></svg>
+      Назад
+    </a>
+    <div class="gtitle">
+      <h1>{{ game_name }}</h1>
+      <p class="gsub" id="gsub"></p>
+    </div>
+  </header>
+  <div id="g-root" data-game="{{ game }}"></div>
+{% endblock %}
+{% block scripts %}
+  <script src="/static/games/common.js"></script>
+  <script src="/static/games/{{ game }}.js"></script>
+{% endblock %}
