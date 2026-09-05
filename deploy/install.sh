@@ -26,11 +26,14 @@ log "installing systemd units"
 rm -f /etc/systemd/system/conspectus-*.service
 cp deploy/conspectus-web.service /etc/systemd/system/
 cp deploy/conspectus-bot.service /etc/systemd/system/
+cp deploy/conspectus-update.service /etc/systemd/system/
+cp deploy/conspectus-update.timer /etc/systemd/system/
 systemctl daemon-reload
 
 log "starting services"
 systemctl enable --now conspectus-web
 systemctl enable --now conspectus-bot
+systemctl enable --now conspectus-update.timer
 systemctl --no-pager status conspectus-web conspectus-bot | head -n 40
 
 log "done"

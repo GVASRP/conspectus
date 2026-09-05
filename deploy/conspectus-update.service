@@ -1,0 +1,6 @@
+[Unit]
+Description=Conspectus git updater
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/conspectus/deploy/update.sh

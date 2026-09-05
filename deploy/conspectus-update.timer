@@ -1,0 +1,10 @@
+[Unit]
+Description=Conspectus git updater timer
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+Unit=conspectus-update.service
+
+[Install]
+WantedBy=timers.target
