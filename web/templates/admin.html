@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель · {{ APP_NAME }}{% endblock %}
+{% block body %}
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Только для администратора</span>
+    <h1>Админ-панель</h1>
+    <p class="lead">Заявки на доступ, пользователи и права доступа.</p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <span class="delta" aria-hidden="true">📥</span>
+        <b class="num" data-count="{{ pending|length }}">{{ pending|length }}</b>
+        <span>заявок ждут</span>
+      </div>
+      <div class="stat">
+        <span class="delta" aria-hidden="true">✓</span>
+        <b class="num" data-count="{{ active_count }}">{{ active_count }}</b>
+        <span>допущено</span>
+      </div>
+      <div class="stat">
+        <span class="delta" aria-hidden="true">🚫</span>
+        <b class="num" data-count="{{ banned_count }}">{{ banned_count }}</b>
+        <span>забанено</span>
+      </div>
+      <div class="stat">
+        <span class="delta" aria-hidden="true">👑</span>
+        <b class="num" data-count="{{ admins_count }}">{{ admins_count }}</b>
+        <span>админов</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="shot reveal">
+    <h2>Заявки на регистрацию <span class="snum">{{ pending|length }}</span></h2>
+    <a href="/admin/users" class="btn sm ghost">Все пользователи</a>
+  </div>
+
+  {% if pending %}
+    <div id="requests">
+    {% for u in pending %}
+      <div class="card reveal d{{ loop.index }}" style="margin-bottom:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div class="index" style="min-width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(139,92,246,.9),rgba(59,130,246,.9));color:#fff;font-family:var(--f-mono);font-weight:700">{{ (u.username[:2])|upper }}</div>
+        <div style="flex:1;min-width:180px">
+          <div style="font-weight:800;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            @{{ u.username }}
+            <span class="pill yellow">ожидает</span>
+          </div>
+          <div style="color:var(--dim);font-size:.85rem;margin-top:4px">
+            {% if u.tg_id %}Telegram: {{ u.tg_id }} · {% endif %}
+            {{ u.created_at.strftime('%d.%m.%Y %H:%M') if u.created_at }}
+          </div>
+        </div>
+        <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap">
+          <form method="post" action="/admin/request/{{ u.id }}/approve">
+            <button class="btn sm" type="submit">
+              <svg class="bic"><use href="/static/icons.svg#i-check"/></svg>
+              Одобрить
+            </button>
+          </form>
+          <form method="post" action="/admin/request/{{ u.id }}/reject"
+                onsubmit="return confirm('Отклонить заявку @{{ u.username }}?')">
+            <button class="btn sm danger ghost" type="submit">
+              <svg class="bic"><use href="/static/icons.svg#i-x"/></svg>
+              Отклонить
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  {% else %}
+    <div class="card reveal d1" style="text-align:center;color:var(--dim);padding:34px">
+      <div class="e" style="font-size:2rem;margin-bottom:10px">✓</div>
+      Нет новых заявок. Ссылку на рег-форму давай только нужным людям.
+    </div>
+  {% endif %}
+
+  <div class="reveal" style="margin-top:34px">
+    <div class="card glow">
+      <h3 style="margin:0 0 10px;display:flex;align-items:center;gap:10px">
+        <svg class="icon" style="width:19px;height:19px;color:#a78bfa"><use href="/static/icons.svg#i-link"/></svg>
+        Ссылка на регистрацию
+      </h3>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <code class="pcode">{{ public_url }}/register</code>
+        <button class="btn sm subtle" data-copy="#reglink">Скопировать</button>
+      </div>
+      <code id="reglink" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">{{ public_url }}/register</code>
+      <p class="hint" style="margin:10px 0 0">Раздавай её только тем, кому доверяешь. Каждая регистрация — только через твоё одобрение.</p>
+    </div>
+  </div>
+{% endblock %}

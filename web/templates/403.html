@@ -1,0 +1,14 @@
+{% extends "auth_base.html" %}
+{% block title %}403 · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  <div class="brand-head" style="text-align:center">
+    <div class="crown" style="background:linear-gradient(135deg,#fb5c7a,#ff8a5c)">
+      <svg class="icon" style="width:30px;height:30px"><use href="/static/icons.svg#i-lock"/></svg>
+    </div>
+    <h2>403 — доступ запрещён</h2>
+    <p>Эта страница только для администраторов.</p>
+  </div>
+  <div style="margin-top:22px">
+    <a class="btn block" href="/">На главную</a>
+  </div>
+{% endblock %}

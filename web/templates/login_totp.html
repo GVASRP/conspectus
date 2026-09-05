@@ -1,0 +1,27 @@
+{% extends "auth_base.html" %}
+{% block title %}2FA · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  {% set _t = 'Код 2FA' %}
+  {% set _s = 'Шаг 2 из 2 — введи код из приложения-аутентификатора' %}
+  {% set _name = name %}
+  {% include "_brand.html" %}
+
+  <div class="auth-sep" style="margin-top:20px"></div>
+
+  <div class="auth-steps">
+    <span class="stepnode done"><i>✓</i><b>Пароль</b></span>
+    <span class="stepnode on"><i>2</i><b>Код 2FA</b></span>
+  </div>
+
+  {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+
+  <form method="post" action="/login/totp" novalidate>
+    <label class="f">6-значный код</label>
+    <input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"
+           required autofocus pattern="\d{6}" placeholder="······"
+           style="text-align:center;font-size:1.55rem;letter-spacing:.45em;font-family:var(--f-mono)">
+    <button class="btn block" type="submit" style="margin-top:22px">Войти</button>
+  </form>
+
+  <div class="auth-switch"><a href="/login">← назад</a></div>
+{% endblock %}

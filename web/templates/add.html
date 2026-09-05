@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Добавить конспект · {{ APP_NAME }}{% endblock %}
+{% block body %}
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Новая запись</span>
+    <h1>Новый конспект</h1>
+    <p class="lead">Вставь расшифровку записи — сразу можно попросить ИИ привести её в порядок.</p>
+  </header>
+
+  <div class="card reveal d1" style="max-width:840px">
+    {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+    <form method="post" action="/add" novalidate>
+      <div class="form-grid" style="align-items:end">
+        <div>
+          <label class="f">Предмет <span class="req">*</span></label>
+          <input type="text" name="subject_name" value="{{ request.query_params.get('subject','') }}" placeholder="Например: Алгебра" list="subj-list">
+          <datalist id="subj-list">
+            {% for s in subjects %}<option value="{{ s.name }}">{% endfor %}
+          </datalist>
+        </div>
+        <div>
+          <label class="f">Или выбери существующий</label>
+          <select name="subject_select">
+            <option value="">—</option>
+            {% for s in subjects %}<option value="{{ s.name }}">{{ s.name }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label class="f">Название</label>
+          <input type="text" name="title" placeholder="Например: Квадратичные уравнения">
+        </div>
+        <div>
+          <label class="f">Тема</label>
+          <input type="text" name="topic" placeholder="Например: Дискриминант">
+        </div>
+      </div>
+
+      <div style="max-width:300px">
+        <label class="f">Дата</label>
+        <input type="text" name="date" placeholder="2026-09-05 или 05.09.2026">
+      </div>
+
+      <label class="f">Текст конспекта <span class="req">*</span></label>
+      <textarea name="content" placeholder="Вставь сюда текст из записи / расшифровки…"></textarea>
+      <div class="ta-count"></div>
+
+      <label class="chk" style="margin-top:16px">
+        <input type="checkbox" name="improve" value="1">
+        <span>
+          <b>Улучшить текст с помощью ИИ</b>
+          <span class="hint" style="display:block">Структурирует запись: заголовки, определения, списки. Режим prompt — бесплатно.</span>
+        </span>
+      </label>
+
+      <div style="margin-top:24px">
+        <button class="btn" type="submit">
+          <svg class="bic"><use href="/static/icons.svg#i-check"/></svg>
+          Сохранить конспект
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

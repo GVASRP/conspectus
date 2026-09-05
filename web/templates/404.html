@@ -1,0 +1,14 @@
+{% extends "auth_base.html" %}
+{% block title %}404 · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  <div class="brand-head" style="text-align:center">
+    <div class="crown" style="background:linear-gradient(135deg,#6366f1,#22d3ee)">
+      <svg class="icon" style="width:30px;height:30px"><use href="/static/icons.svg#i-search"/></svg>
+    </div>
+    <h2>404 — ничего нет</h2>
+    <p>Конспект или страница не найдены.</p>
+  </div>
+  <div style="margin-top:22px">
+    <a class="btn block" href="/">На главную</a>
+  </div>
+{% endblock %}

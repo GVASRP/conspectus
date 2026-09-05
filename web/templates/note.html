@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }} · {{ APP_NAME }}{% endblock %}
+{% block head %}
+  <meta name="description" content="{% if note.topic %}{{ note.topic }} · {% endif %}{% if note.date %}{{ note.date }}{% endif %}">
+{% endblock %}
+{% block body %}
+  <div class="pbar"></div>
+
+  <div class="reveal in" style="margin:30px 0 0">
+    <a href="/subject/{{ note.subject_id }}" class="btn ghost sm">
+      <svg class="bic" style="width:15px;height:15px"><use href="/static/icons.svg#i-arrow-left"/></svg>
+      {{ note.subject.name }}
+    </a>
+  </div>
+
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Конспект{% if note.topic %} · {{ note.topic }}{% endif %}</span>
+    <h1>{{ note.title }}</h1>
+    <p class="lead" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      {% if note.date %}
+      <span class="chip" style="font-size:.8rem"><svg style="width:13px;height:13px"><use href="/static/icons.svg#i-calendar"/></svg>{{ note.date }}</span>
+      {% endif %}
+      {% if note.topic %}
+      <span class="chip" style="font-size:.8rem"><svg style="width:13px;height:13px"><use href="/static/icons.svg#i-tag"/></svg>{{ note.topic }}</span>
+      {% endif %}
+      {% if note.created_at %}
+      <span style="color:var(--dim);font-size:.85rem">{{ note.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+      {% endif %}
+    </p>
+  </header>
+
+  <article class="paper reveal d1" id="note-content">
+    <div class="md">{{ html|safe }}</div>
+  </article>
+
+  {% if note.raw_content and note.raw_content != note.content %}
+  <details class="tog reveal d2">
+    <summary>Показать исходную запись</summary>
+    <pre>{{ note.raw_content }}</pre>
+  </details>
+  {% endif %}
+
+  <div class="reveal d2" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px">
+    <button class="btn ghost sm" data-copy="#note-content">
+      <svg class="bic"><use href="/static/icons.svg#i-copy"/></svg>
+      Скопировать конспект
+    </button>
+    <form method="post" action="/note/{{ note.id }}/delete"
+          onsubmit="return confirm('Точно удалить этот конспект?')">
+      <button class="btn danger ghost sm" type="submit">
+        <svg class="bic"><use href="/static/icons.svg#i-trash"/></svg>
+        Удалить
+      </button>
+    </form>
+  </div>
+{% endblock %}

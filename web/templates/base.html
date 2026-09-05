@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0b0b16">
+  <meta name="description" content="Conspectus — личная база конспектов с ИИ-улучшением">
+  <link rel="stylesheet" href="/static/style.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="base"></div>
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grid"></div>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="nav" role="navigation">
+    <div class="nav-in">
+      <a class="logo" href="/">
+        <span class="logo-mark">C</span>
+        <span>{{ APP_NAME }}</span>
+      </a>
+      <div class="nav-links">
+        <a href="/" class="{% if active == 'home' %}on{% endif %}">
+          <svg class="nic"><use href="/static/icons.svg#i-book"/></svg>
+          Конспекты
+        </a>
+        <a href="/add" class="{% if active == 'add' %}on{% endif %}">
+          <svg class="nic"><use href="/static/icons.svg#i-plus"/></svg>
+          Добавить
+        </a>
+        {% if user and user.role == 'admin' %}
+        <a href="/admin" class="{% if active == 'admin' %}on{% endif %}">
+          <svg class="nic"><use href="/static/icons.svg#i-shield"/></svg>
+          Админ
+        </a>
+        {% endif %}
+      </div>
+      <div class="nav-right">
+        <div class="nav-info">
+          <span class="date-chunk"></span>
+          <span class="clock"></span>
+        </div>
+        {% if user %}
+        <span class="chip">
+          <svg class="icon" style="width:14px;height:14px"><use href="/static/icons.svg#i-user"/></svg>
+          @{{ user.username }}
+        </span>
+        {% if user.role == 'admin' %}<span class="chip admin"><span class="dot"></span>админ</span>{% endif %}
+        <a class="btn ghost sm" href="/settings" title="Настройки">
+          <svg class="bic"><use href="/static/icons.svg#i-gear"/></svg>
+        </a>
+        <a class="btn subtle sm" href="/logout" title="Выйти">
+          <svg class="bic"><use href="/static/icons.svg#i-logout"/></svg>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    {% block body %}{% endblock %}
+  </main>
+
+  <div class="foot">
+    {{ APP_NAME }}<span class="sep"></span>личная база знаний<span class="sep"></span>
+    <a href="/settings">настройки</a>
+  </div>
+
+  <script src="/static/app.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

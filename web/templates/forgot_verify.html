@@ -1,0 +1,37 @@
+{% extends "auth_base.html" %}
+{% block title %}Новый пароль · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  {% set _t = 'Новый пароль' %}
+  {% set _s = 'Шаг 2 из 2 — введи код из Telegram, новый пароль и код 2FA' %}
+  {% set _name = name %}
+  {% include "_brand.html" %}
+
+  <div class="auth-sep" style="margin-top:20px"></div>
+
+  <div class="auth-steps">
+    <span class="stepnode done"><i>✓</i><b>Логин</b></span>
+    <span class="stepnode on"><i>2</i><b>Код и пароль</b></span>
+  </div>
+
+  {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+
+  <form method="post" action="/forgot/verify" novalidate>
+    <label class="f">Код из Telegram</label>
+    <input type="text" name="code" inputmode="numeric" maxlength="6" required autofocus placeholder="······"
+           style="text-align:center;font-size:1.5rem;letter-spacing:.45em;font-family:var(--f-mono)">
+    <div class="form-grid">
+      <div>
+        <label class="f">Новый пароль</label>
+        <input type="password" name="password" required minlength="8" autocomplete="new-password">
+      </div>
+      <div>
+        <label class="f">Повтори пароль</label>
+        <input type="password" name="password2" required minlength="8" autocomplete="new-password">
+      </div>
+    </div>
+    <label class="f">Код 2FA из приложения</label>
+    <input type="text" name="totp" inputmode="numeric" maxlength="6" required placeholder="······"
+           style="text-align:center;font-size:1.4rem;letter-spacing:.4em;font-family:var(--f-mono)">
+    <button class="btn block" type="submit" style="margin-top:22px">Сохранить новый пароль</button>
+  </form>
+{% endblock %}

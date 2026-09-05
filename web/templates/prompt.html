@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Промт для ИИ · {{ APP_NAME }}{% endblock %}
+{% block body %}
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Режим prompt · бесплатно</span>
+    <h1>Промт готов</h1>
+    <p class="lead">
+      Исходная запись сохранена. Скопируй промт и вставь его в любую нейросеть — улучшенный текст
+      отправь боту (<code class="md-code">/improve {{ note.id }}</code>) или сохрани через сайт.
+    </p>
+  </header>
+
+  <div class="card reveal d1">
+    <div class="md" contenteditable="true" id="prompt-box" spellcheck="false"
+         style="font-family:var(--f-mono);font-size:.88rem;background:rgba(6,9,22,.75);border:1px solid var(--line);border-radius:16px;padding:18px;white-space:pre-wrap;word-break:break-word;max-height:430px;overflow:auto;color:var(--ink2)">{{ prompt }}</div>
+    <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" data-copy="#prompt-box">
+        <svg class="bic"><use href="/static/icons.svg#i-copy"/></svg>
+        Скопировать промт
+      </button>
+      <a class="btn ghost" href="/note/{{ note.id }}">
+        К сохранённой записи
+      </a>
+    </div>
+  </div>
+{% endblock %}

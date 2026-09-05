@@ -1,0 +1,17 @@
+{% extends "auth_base.html" %}
+{% block title %}Заявка отправлена · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  <div class="brand-head" style="text-align:center">
+    <div class="crown" style="animation:floaty 3.2s ease-in-out infinite">
+      <svg class="icon" style="width:30px;height:30px"><use href="/static/icons.svg#i-check"/></svg>
+    </div>
+    <h2>Заявка отправлена!</h2>
+    <p>Администратор получил уведомление и рассмотрит заявку.<br>Как только одобрят — сможешь войти.</p>
+  </div>
+
+  <div class="auth-sep" style="margin-top:22px"></div>
+
+  <div style="margin-top:22px">
+    <a class="btn block" href="/login">Вернуться ко входу</a>
+  </div>
+{% endblock %}

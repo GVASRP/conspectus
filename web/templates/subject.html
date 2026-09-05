@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ subject.name }} · {{ APP_NAME }}{% endblock %}
+{% block body %}
+  <div class="reveal in" style="margin:30px 0 0">
+    <a href="/" class="btn ghost sm">
+      <svg class="bic" style="width:15px;height:15px"><use href="/static/icons.svg#i-arrow-left"/></svg>
+      Все предметы
+    </a>
+  </div>
+
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Предмет</span>
+    <h1>{{ subject.name }}</h1>
+    <p class="lead">Конспектов: {{ notes|length }}</p>
+    <div class="stat-row">
+      <a href="/add?subject={{ subject.name }}" class="btn">
+        <svg class="bic"><use href="/static/icons.svg#i-plus"/></svg>
+        Добавить конспект
+      </a>
+    </div>
+  </header>
+
+  <div class="shot reveal">
+    <h2>Материалы <span class="snum">{{ notes|length }}</span></h2>
+    <div class="search-wrap">
+      <svg class="search-icon"><use href="/static/icons.svg#i-search"/></svg>
+      <input class="search" type="text" placeholder="Поиск по теме или дате…" data-search="#list">
+    </div>
+  </div>
+
+  <div id="list">
+    {% for n in notes %}
+      <a class="note-item s-item reveal d{{ loop.index }}" href="/note/{{ n.id }}" data-s="{{ (n.title ~ ' ' ~ n.topic ~ ' ' ~ n.date)|lower }}">
+        <span class="index">{{ "%02d"|format(loop.index) }}</span>
+        <span class="body">
+          <span class="t">{{ n.title }}</span>
+          <span class="d">
+            {% if n.topic %}<span class="tagc"># {{ n.topic }}</span>{% endif %}
+            {% if n.date %}
+            <span class="tagc" style="display:inline-flex;align-items:center;gap:5px">
+              <svg style="width:13px;height:13px"><use href="/static/icons.svg#i-calendar"/></svg>
+              {{ n.date }}
+            </span>
+            {% endif %}
+          </span>
+        </span>
+        <span class="chev"><svg><use href="/static/icons.svg#i-chevron"/></svg></span>
+      </a>
+    {% else %}
+      <div class="empty reveal d1">
+        <div class="e">🗒</div>
+        Конспектов пока нет.<br>Нажми «Добавить конспект».
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

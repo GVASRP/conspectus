@@ -1,0 +1,24 @@
+{% extends "auth_base.html" %}
+{% block title %}Восстановление · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  {% set _t = 'Восстановление пароля' %}
+  {% set _s = 'Шаг 1 из 2 — укажи логин, мы пришлём код тебе в Telegram' %}
+  {% include "_brand.html" %}
+
+  <div class="auth-sep" style="margin-top:20px"></div>
+
+  <div class="auth-steps">
+    <span class="stepnode on"><i>1</i><b>Логин</b></span>
+    <span class="stepnode"><i>2</i><b>Код и пароль</b></span>
+  </div>
+
+  {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+
+  <form method="post" action="/forgot" novalidate>
+    <label class="f">Логин</label>
+    <input type="text" name="username" required autofocus>
+    <button class="btn block" type="submit" style="margin-top:22px">Отправить код</button>
+  </form>
+
+  <div class="auth-switch"><a href="/login">← ко входу</a></div>
+{% endblock %}

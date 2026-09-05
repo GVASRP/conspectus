@@ -1,0 +1,32 @@
+{% extends "auth_base.html" %}
+{% block title %}Заявка · {{ APP_NAME }}{% endblock %}
+{% block card %}
+  {% set _t = 'Заявка на доступ' %}
+  {% set _s = 'Создай аккаунт — администратор одобрит его вручную' %}
+  {% include "_brand.html" %}
+
+  <div class="auth-sep" style="margin-top:20px"></div>
+
+  <div class="auth-steps">
+    <span class="stepnode on"><i>1</i><b>Данные</b></span>
+    <span class="stepnode"><i>2</i><b>2FA</b></span>
+    <span class="stepnode"><i>3</i><b>Готово</b></span>
+  </div>
+
+  {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+
+  <form method="post" action="/register" novalidate>
+    <label class="f">Логин</label>
+    <input type="text" name="username" required autofocus pattern="[A-Za-z0-9_\-.]+" minlength="3" maxlength="32"
+           placeholder="3–32 символа: буквы, цифры, _ - .">
+    <label class="f">Пароль</label>
+    <input type="password" name="password" required minlength="8" placeholder="Минимум 8 символов" autocomplete="new-password">
+    <label class="f">Повтори пароль</label>
+    <input type="password" name="password2" required minlength="8" autocomplete="new-password">
+    <label class="f">Telegram ID <span class="hint" style="display:inline">(для восстановления пароля, необязательно)</span></label>
+    <input type="text" name="tg_id" placeholder="Например: 712345678 (узнать у @userinfobot)">
+    <button class="btn block" type="submit" style="margin-top:22px">Продолжить</button>
+  </form>
+
+  <div class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></div>
+{% endblock %}

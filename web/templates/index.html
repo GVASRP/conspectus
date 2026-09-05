@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} · Конспекты{% endblock %}
+{% block body %}
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Личная база знаний · 10 класс</span>
+    <h1>Твоя база знаний</h1>
+    <p class="lead">Все конспекты в одном месте. Диктуй записи — получай порядок: по предметам, темам и датам.</p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <span class="delta" aria-hidden="true">✦</span>
+        <b class="num" data-count="{{ subjects|length }}">{{ subjects|length }}</b>
+        <span>предметов</span>
+      </div>
+      <div class="stat">
+        <span class="delta" aria-hidden="true">📄</span>
+        <b class="num" data-count="{{ total }}">{{ total }}</b>
+        <span>конспектов</span>
+      </div>
+      <div class="stat">
+        <span class="delta" aria-hidden="true">🔥</span>
+        <b class="num" data-count="{{ today_notes }}">{{ today_notes }}</b>
+        <span>за сегодня</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="shot reveal">
+    <h2>Предметы <span class="snum">{{ subjects|length }}</span></h2>
+    <div class="shot-side">
+      <div class="search-wrap">
+        <svg class="search-icon"><use href="/static/icons.svg#i-search"/></svg>
+        <input class="search" id="search" type="text" placeholder="Поиск предмета…" data-search="#grid">
+      </div>
+    </div>
+  </div>
+
+  <div class="subj-grid" id="grid">
+    {% for s in subjects %}
+      {% set palette = ['g-p','g-b','g-c','g-r','g-w','g-g','g-d','metric'] %}
+      {% set accent = palette[s.id % palette|length] %}
+      {% set first = s.name[:1]|upper %}
+      {% if first in 'АБВГДЁ' %}📖{% elif first in 'ЕЖЗИЙК' %}📐{% elif first in 'ЛМНОП' %}🧪{% elif first in 'РСТУФХ' %}🌍{% else %}✏️{% endif %}
+      <a class="subj {{ accent }} s-item reveal" href="/subject/{{ s.id }}" data-s="{{ s.name|lower }}">
+        <span class="top">
+          <span class="ic">{{ first }}</span>
+          <span class="cnt">{{ counts[s.id] }} конс.</span>
+        </span>
+        <span class="nm">{{ s.name }}</span>
+        <span class="bline">
+          <span class="meta">
+            <svg class="icon" style="width:14px;height:14px"><use href="/static/icons.svg#i-file"/></svg>
+            {{ counts[s.id] }} {% if counts[s.id]|string|last == '1' and counts[s.id] != 11 %}конспект{% elif counts[s.id] % 10 in [2,3,4] and counts[s.id] % 100 not in [12,13,14] %}конспекта{% else %}конспектов{% endif %}
+          </span>
+        </span>
+      </a>
+    {% else %}
+      <div class="empty full reveal in">
+        <div class="e">🌱</div>
+        Пока нет предметов.<br>Добавь первый конспект
+        <div class="mt"><a href="/add" class="btn">Добавить первый конспект</a></div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if last_notes %}
+  <div class="shot reveal" style="margin-top:52px">
+    <h2>Недавние обновления <span class="snum">{{ last_notes|length }}</span></h2>
+    <a href="/add" class="btn sm ghost">
+      <svg class="bic"><use href="/static/icons.svg#i-plus"/></svg>
+      Добавить
+    </a>
+  </div>
+  <div class="reveal d2">
+    {% for n in last_notes %}
+      <a class="note-item s-item reveal d{{ loop.index }}" href="/note/{{ n.id }}" data-s="{{ (n.title ~ ' ' ~ n.topic ~ ' ' ~ n.subject.name)|lower }}">
+        <span class="index">{{ (n.subject.name[:2])|upper }}</span>
+        <span class="body">
+          <span class="t">{{ n.title }}</span>
+          <span class="d">
+            <span class="tagc">{{ n.subject.name }}</span>
+            {% if n.topic %}<span>· {{ n.topic }}</span>{% endif %}
+            {% if n.date %}<span>· {{ n.date }}</span>{% endif %}
+          </span>
+        </span>
+        <span class="chev"><svg><use href="/static/icons.svg#i-chevron"/></svg></span>
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endblock %}

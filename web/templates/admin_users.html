@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Пользователи · {{ APP_NAME }}{% endblock %}
+{% block body %}
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Админ-панель</span>
+    <h1>Пользователи</h1>
+    <p class="lead">Статусы, роли и права доступа.</p>
+    <div class="stat-row">
+      <a href="/admin" class="btn ghost sm">
+        <svg class="bic" style="width:15px;height:15px"><use href="/static/icons.svg#i-arrow-left"/></svg>
+        В админ-панель
+      </a>
+    </div>
+  </header>
+
+  <div class="card reveal d1" style="padding:0;overflow:hidden">
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr><th>Пользователь</th><th>Роль</th><th>Статус</th><th>Telegram</th><th>Регистрация</th><th>Действия</th></tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td><span class="uname">@{{ u.username }}</span></td>
+            <td>
+              {% if u.role == 'admin' %}<span class="pill pink">👑 админ</span>
+              {% else %}<span class="pill gray">user</span>{% endif %}
+            </td>
+            <td>
+              {% if u.status == 'active' %}<span class="pill green">допущен</span>
+              {% elif u.status == 'pending' %}<span class="pill yellow">заявка</span>
+              {% elif u.status == 'banned' %}<span class="pill red">забанен</span>
+              {% else %}<span class="pill gray">отклонён</span>{% endif %}
+            </td>
+            <td style="color:var(--muted);font-family:var(--f-mono);font-size:.85rem">{{ u.tg_id or '—' }}</td>
+            <td style="color:var(--muted)">{{ u.created_at.strftime('%d.%m.%Y') if u.created_at }}</td>
+            <td>
+              <div class="acts">
+                {% if u.status == 'pending' %}
+                  <form method="post" action="/admin/request/{{ u.id }}/approve"><button class="btn xs">одобрить</button></form>
+                  <form method="post" action="/admin/request/{{ u.id }}/reject"><button class="btn xs danger ghost">отклонить</button></form>
+                {% elif u.status == 'banned' %}
+                  <form method="post" action="/admin/user/{{ u.id }}/unban"><button class="btn xs">разбанить</button></form>
+                {% elif u.id != admin.id and u.role == 'admin' %}
+                  <form method="post" action="/admin/user/{{ u.id }}/role"><button class="btn xs subtle">снять админа</button></form>
+                {% elif u.id != admin.id %}
+                  {% if u.role != 'admin' %}
+                    <form method="post" action="/admin/user/{{ u.id }}/role"><button class="btn xs subtle">сделать админом</button></form>
+                  {% endif %}
+                  <form method="post" action="/admin/user/{{ u.id }}/ban"
+                        onsubmit="return confirm('Забанить @{{ u.username }}?')"><button class="btn xs danger ghost">забанить</button></form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

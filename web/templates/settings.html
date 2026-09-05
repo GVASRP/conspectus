@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Настройки · {{ APP_NAME }}{% endblock %}
+{% block body %}
+  <header class="hero reveal in">
+    <span class="kicker"><span class="dot"></span>Профиль и безопасность</span>
+    <h1>Настройки</h1>
+    <p class="lead">Профиль, привязка Telegram и смена пароля. Для смены пароля нужны текущий пароль и код 2FA.</p>
+  </header>
+
+  <div class="reveal d1">
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="margin:0 0 12px;display:flex;align-items:center;gap:10px">
+        <svg class="icon" style="width:19px;height:19px;color:#a78bfa"><use href="/static/icons.svg#i-user"/></svg>
+        Профиль
+      </h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <span class="chip">@{{ u.username }}</span>
+        {% if u.role == 'admin' %}<span class="chip admin"><span class="dot"></span>админ</span>{% endif %}
+        {% if u.status == 'active' %}<span class="pill green">допущен</span>{% endif %}
+        {% if u.totp_confirmed %}
+          <span class="pill green"><svg class="icon" style="width:12px;height:12px;margin-right:4px;color:currentColor"><use href="/static/icons.svg#i-shield"/></svg>2FA включена</span>
+        {% else %}<span class="pill red">2FA не настроена</span>{% endif %}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="margin:0 0 8px;display:flex;align-items:center;gap:10px">
+        <svg class="icon" style="width:19px;height:19px;color:#22d3ee"><use href="/static/icons.svg#i-send"/></svg>
+        Telegram для восстановления пароля
+      </h3>
+      <p class="hint" style="font-size:.9rem;margin:0 0 10px">
+        Привяжи Telegram ID — через него придёт код, если забудешь пароль.
+      </p>
+      {% if ok %}<div class="alert ok">{{ ok }}</div>{% endif %}
+      {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+      <form method="post" action="/settings/tg" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px">
+          <label class="f" style="margin-top:8px">Telegram ID</label>
+          <input type="text" name="tg_id" value="{{ u.tg_id }}" placeholder="712345678 (узнать у @userinfobot)">
+        </div>
+        <button class="btn" type="submit">Сохранить</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px;display:flex;align-items:center;gap:10px">
+        <svg class="icon" style="width:19px;height:19px;color:#fb5c7a"><use href="/static/icons.svg#i-lock"/></svg>
+        Смена пароля
+      </h3>
+      <p class="hint" style="font-size:.9rem;margin:0 0 14px">
+        Для смены нужны <b>текущий пароль</b> и <b>код 2FA</b>.
+      </p>
+      <form method="post" action="/settings/password" style="max-width:540px">
+        <div class="form-grid">
+          <div>
+            <label class="f">Текущий пароль</label>
+            <input type="password" name="current" required autocomplete="current-password">
+          </div>
+          <div>
+            <label class="f">Код 2FA</label>
+            <input type="text" name="totp" inputmode="numeric" maxlength="6" required placeholder="••••••"
+                   style="text-align:center;font-family:var(--f-mono);letter-spacing:.35em">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label class="f">Новый пароль</label>
+            <input type="password" name="password" required minlength="8" autocomplete="new-password">
+          </div>
+          <div>
+            <label class="f">Повтори</label>
+            <input type="password" name="password2" required minlength="8" autocomplete="new-password">
+          </div>
+        </div>
+        <button class="btn" type="submit" style="margin-top:20px">Сменить пароль</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
