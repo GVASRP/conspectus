@@ -6,6 +6,12 @@ cd "$APP"
 
 log() { echo "[install] $*"; }
 
+log "checking python venv + git"
+if ! python3 -m venv --help >/dev/null 2>&1; then
+  apt-get update -qq
+  apt-get install -y python3-venv git
+fi
+
 log "removing caches"
 find . -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
 
