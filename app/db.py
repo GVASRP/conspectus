@@ -175,7 +175,11 @@ def check_reset_code(db, user: User, code: str) -> bool:
     return ok
 
 
-engine = create_engine(f"sqlite:///{DB_PATH}", connect_args={"check_same_thread": False})
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+if DATABASE_URL:
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+else:
+    engine = create_engine(f"sqlite:///{DB_PATH}", connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
