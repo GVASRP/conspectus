@@ -1,0 +1,5 @@
+[project]
+name = "app"
+version = "0.1.0"
+dependencies = [ "aiogram", "fastapi", "uvicorn", "jinja2", "python-multipart", "sqlalchemy", "python-dotenv", "httpx", "aiofiles", "psycopg[binary]", "a2wsgi", "itsdangerous", "pyotp", "qrcode", "markdown" ]
+requires-python = "~=3.12.0"

@@ -228,7 +228,13 @@ def check_email_code(db, user: User, code: str) -> bool:
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 if DATABASE_URL:
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    _url = DATABASE_URL
+    if _url.startswith("postgres://"):
+        _url = "postgresql" + _url[len("postgres"):]
+    # лёгкий чистый драйвер без нативных бинарников (устойчив на serverless)
+    if _url.startswith("postgresql://") and "+" not in _url.split("://")[0]:
+        _url = "postgresql+pg8000://" + _url.split("postgresql://", 1)[1]
+    engine = create_engine(_url, pool_pre_ping=True)
 else:
     # Без DATABASE_URL — in-memory sqlite (Vercel: файловая система read-only,
     # файла на диске создать нельзя). Данные живут до конца процесса.
