@@ -63,7 +63,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
-    totp_secret = Column(String(64), default="", nullable=False)
+    email = Column(String(200), default="", nullable=False)  # для 2FA-кодов
+    totp_secret = Column(String(64), default="", nullable=False)  # устарело, оставлено для совместимости
     totp_confirmed = Column(Boolean, default=False, nullable=False)
     tg_id = Column(String(32), default="", nullable=False)  # для сброса пароля через Telegram
     role = Column(String(20), default=ROLE_USER, nullable=False)
@@ -71,6 +72,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     reset_codes = relationship("ResetCode", back_populates="user", cascade="all, delete-orphan")
+    email_codes = relationship("EmailCode", back_populates="user", cascade="all, delete-orphan")
 
 
 class ResetCode(Base):
@@ -84,6 +86,19 @@ class ResetCode(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="reset_codes")
+
+
+class EmailCode(Base):
+    __tablename__ = "email_codes"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    code_hash = Column(String(128), nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="email_codes")
 
 
 _PBKDF2_ITER = 200_000
@@ -164,6 +179,41 @@ def check_reset_code(db, user: User, code: str) -> bool:
             ResetCode.expires_at > datetime.utcnow(),
         )
         .order_by(ResetCode.id.desc())
+        .first()
+    )
+    if not row:
+        return False
+    ok = secrets.compare_digest(row.code_hash, hashlib.sha256(code.strip().encode()).hexdigest())
+    if ok:
+        row.used = True
+        db.commit()
+    return ok
+
+
+def issue_email_code(db, user: User) -> str:
+    """6-значный код 2FA для входа по почте."""
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    db.query(EmailCode).filter(EmailCode.user_id == user.id, EmailCode.used.is_(False)).update(
+        {EmailCode.used: True}, synchronize_session=False
+    )
+    db.add(EmailCode(
+        user_id=user.id,
+        code_hash=hashlib.sha256(code.encode()).hexdigest(),
+        expires_at=datetime.utcnow() + RESET_CODE_TTL,
+    ))
+    db.commit()
+    return code
+
+
+def check_email_code(db, user: User, code: str) -> bool:
+    row = (
+        db.query(EmailCode)
+        .filter(
+            EmailCode.user_id == user.id,
+            EmailCode.used.is_(False),
+            EmailCode.expires_at > datetime.utcnow(),
+        )
+        .order_by(EmailCode.id.desc())
         .first()
     )
     if not row:

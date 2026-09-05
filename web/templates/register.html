@@ -9,8 +9,7 @@
 
   <div class="auth-steps">
     <span class="stepnode on"><i>1</i><b>Данные</b></span>
-    <span class="stepnode"><i>2</i><b>2FA</b></span>
-    <span class="stepnode"><i>3</i><b>Готово</b></span>
+    <span class="stepnode"><i>2</i><b>Готово</b></span>
   </div>
 
   {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
@@ -23,9 +22,11 @@
     <input type="password" name="password" required minlength="8" placeholder="Минимум 8 символов" autocomplete="new-password">
     <label class="f">Повтори пароль</label>
     <input type="password" name="password2" required minlength="8" autocomplete="new-password">
-    <label class="f">Telegram ID <span class="hint" style="display:inline">(для восстановления пароля, необязательно)</span></label>
+    <label class="f">Email <span class="hint" style="display:inline">(на него приходят коды входа)</span></label>
+    <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+    <label class="f">Telegram ID <span class="hint" style="display:inline">(необязательно)</span></label>
     <input type="text" name="tg_id" placeholder="Например: 712345678 (узнать у @userinfobot)">
-    <button class="btn block" type="submit" style="margin-top:22px">Продолжить</button>
+    <button class="btn block" type="submit" style="margin-top:22px">Отправить заявку</button>
   </form>
 
   <div class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></div>

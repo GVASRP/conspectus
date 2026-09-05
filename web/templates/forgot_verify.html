@@ -2,7 +2,7 @@
 {% block title %}Новый пароль · {{ APP_NAME }}{% endblock %}
 {% block card %}
   {% set _t = 'Новый пароль' %}
-  {% set _s = 'Шаг 2 из 2 — введи код из Telegram, новый пароль и код 2FA' %}
+  {% set _s = 'Шаг 2 из 2 — введи код из почты и новый пароль' %}
   {% set _name = name %}
   {% include "_brand.html" %}
 
@@ -16,7 +16,7 @@
   {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
 
   <form method="post" action="/forgot/verify" novalidate>
-    <label class="f">Код из Telegram</label>
+    <label class="f">Код из почты</label>
     <input type="text" name="code" inputmode="numeric" maxlength="6" required autofocus placeholder="······"
            style="text-align:center;font-size:1.5rem;letter-spacing:.45em;font-family:var(--f-mono)">
     <div class="form-grid">
@@ -29,9 +29,6 @@
         <input type="password" name="password2" required minlength="8" autocomplete="new-password">
       </div>
     </div>
-    <label class="f">Код 2FA из приложения</label>
-    <input type="text" name="totp" inputmode="numeric" maxlength="6" required placeholder="······"
-           style="text-align:center;font-size:1.4rem;letter-spacing:.4em;font-family:var(--f-mono)">
     <button class="btn block" type="submit" style="margin-top:22px">Сохранить новый пароль</button>
   </form>
 {% endblock %}
