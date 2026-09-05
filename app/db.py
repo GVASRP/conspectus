@@ -1,6 +1,7 @@
 import hashlib
 import os
 import secrets
+import ssl as _ssl
 from base64 import b64decode, b64encode
 from datetime import datetime, timedelta
 
@@ -234,7 +235,13 @@ if DATABASE_URL:
     # лёгкий чистый драйвер без нативных бинарников (устойчив на serverless)
     if _url.startswith("postgresql://") and "+" not in _url.split("://")[0]:
         _url = "postgresql+pg8000://" + _url.split("postgresql://", 1)[1]
-    engine = create_engine(_url, pool_pre_ping=True)
+    # Supabase pooler требует TLS, но у многоклиентского пулера (Supavisor)
+    # в цепочке свой self-signed root, который не проходит проверку штатными CA.
+    # Оставляем шифрование канала, верификацию цепочки отключаем (аналог sslmode=require).
+    _tls = _ssl.create_default_context()
+    _tls.check_hostname = False
+    _tls.verify_mode = _ssl.CERT_NONE
+    engine = create_engine(_url, pool_pre_ping=True, connect_args={"ssl_context": _tls})
 else:
     # Без DATABASE_URL — in-memory sqlite (Vercel: файловая система read-only,
     # файла на диске создать нельзя). Данные живут до конца процесса.
