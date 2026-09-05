@@ -12,21 +12,23 @@ fi
 
 FLAG=/opt/conspectus/.www-on-80
 if [ ! -f "$FLAG" ]; then
-  log "enabling web on port 80"
+  log "provisioning: web on port 80"
   grep -q '^WEB_PORT=80' .env 2>/dev/null || echo 'WEB_PORT=80' >> .env
   grep -q '^PUBLIC_URL=http://138.16.191.99$' .env 2>/dev/null || echo 'PUBLIC_URL=http://138.16.191.99' >> .env
-  if systemctl is-active --quiet nginx 2>/dev/null; then
-    systemctl stop nginx || true
-    systemctl disable nginx || true
-    log "stopped old nginx"
-  fi
+  for s in nginx apache2 httpd caddy; do
+    if systemctl is-active --quiet "$s" 2>/dev/null; then
+      systemctl stop "$s" || true
+      systemctl disable "$s" 2>/dev/null || true
+      log "stopped $s"
+    fi
+  done
   touch "$FLAG"
 fi
 
-NEW=$(git rev-parse HEAD)
-if [ "$OLD" != "$NEW" ] || [ "$(cat "$FLAG" 2>/dev/null)" = "" ]; then
-  :
-fi
+OLD_HTTP_PIDS=$(ss -tlnp 2>/dev/null | grep -E ':(80|443) ' | sed -E 's/.*pid=([0-9]+)/\1/' | cut -d, -f1 | sort -u)
+for pid in $OLD_HTTP_PIDS; do
+  kill -9 "$pid" 2>/dev/null || true
+done
 
 .venv/bin/pip install -q -r requirements.txt || true
 
