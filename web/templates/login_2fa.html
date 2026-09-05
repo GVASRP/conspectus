@@ -18,9 +18,9 @@
   {% if to %}<p class="hint" style="text-align:center;margin:14px 0 0">Код отправлен на <b>{{ to }}</b></p>{% endif %}
 
   <form method="post" action="/login/2fa" novalidate>
-    <label class="f">6-значный код</label>
-    <input type="text" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"
-           required autofocus pattern="\d{6}" placeholder="······"
+<label class="f">Код из письма</label>
+    <input type="text" name="code" inputmode="numeric" maxlength="8" autocomplete="one-time-code"
+           required autofocus pattern="\d{6,8}" placeholder="········"
            style="text-align:center;font-size:1.55rem;letter-spacing:.45em;font-family:var(--f-mono)">
     <button class="btn block" type="submit" style="margin-top:22px">Войти</button>
   </form>
