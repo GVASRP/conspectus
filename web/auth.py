@@ -15,15 +15,11 @@ from app.db import (
     STATUS_PENDING,
     STATUS_REJECTED,
     User,
-    check_email_code,
-    check_reset_code,
     get_db,
     hash_password,
-    issue_email_code,
-    issue_reset_code,
     verify_password,
 )
-from app.mail import send_email
+from app.mail import send_code, verify_code
 from app.notify import notify_admin
 from web.deps import require_login, templates
 
@@ -38,13 +34,8 @@ def _render(request: Request, name: str, ctx: dict):
 
 
 async def _start_2fa(db: Session, request: Request, user: User) -> bool:
-    """Генерирует код 2FA и отправляет его на почту пользователя."""
-    code = issue_email_code(db, user)
-    return await send_email(
-        user.email,
-        f"Код для входа · {config.APP_NAME}",
-        f"{config.APP_NAME}: твой код для входа — {code}.\nДействует 10 минут.",
-    )
+    """Отправляет код 2FA на почту пользователя через Supabase Auth."""
+    return await send_code(user.email)
 
 
 # ---------------------------------------------------------------- login
@@ -127,7 +118,7 @@ def login_2fa_form(request: Request):
 
 
 @router.post("/login/2fa")
-def login_2fa_post(
+async def login_2fa_post(
     request: Request,
     code: str = Form(""),
     db: Session = Depends(get_db),
@@ -136,7 +127,7 @@ def login_2fa_post(
     if not uid:
         return RedirectResponse("/login", status_code=303)
     user = db.get(User, uid)
-    if not user or not check_email_code(db, user, code):
+    if not user or not await verify_code(user.email, code):
         return _render(request, "login_2fa.html", {
             "name": user.username if user else "",
             "to": request.session.get("2fa_to", ""),
@@ -226,12 +217,7 @@ async def forgot_post(
         return generic
     if not user.email:
         return _render(request, "forgot.html", {"error": "К аккаунту не привязана почта. Обратись к администратору."})
-    code = issue_reset_code(db, user)
-    ok = await send_email(
-        user.email,
-        f"Восстановление пароля · {config.APP_NAME}",
-        f"{config.APP_NAME}: код для сброса пароля — {code}. Действует 10 минут.",
-    )
+    ok = await send_code(user.email)
     if not ok:
         return _render(request, "forgot.html", {"error": "Не удалось отправить код — почта временно недоступна."})
     request.session["forgot_uid"] = user.id
@@ -247,7 +233,7 @@ def forgot_verify_form(request: Request):
 
 
 @router.post("/forgot/verify")
-def forgot_verify_post(
+async def forgot_verify_post(
     request: Request,
     code: str = Form(""),
     password: str = Form(""),
@@ -260,7 +246,7 @@ def forgot_verify_post(
     user = db.get(User, uid)
     if not user:
         return RedirectResponse("/forgot", status_code=303)
-    if not check_reset_code(db, user, code):
+    if not await verify_code(user.email, code):
         return _render(request, "forgot_verify.html",
                        {"name": user.username, "error": "Неверный или просроченный код."})
     if len(password) < 8:

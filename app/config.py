@@ -39,14 +39,9 @@ WEB_EXTRA_USERS = os.getenv("WEB_EXTRA_USERS", "")
 # Telegram ID админа — для уведомлений о новых заявках (пусто = не слать)
 ADMIN_TG_ID = os.getenv("ADMIN_TG_ID", "")
 
-# SMTP для отправки 2FA-кодов и писем
-EMAIL_HOST = os.getenv("EMAIL_HOST", "")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
-EMAIL_USER = os.getenv("EMAIL_USER", "")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
-EMAIL_FROM = os.getenv("EMAIL_FROM", "")
-EMAIL_STARTTLS = get_bool("EMAIL_STARTTLS", True)
-EMAIL_SSL = get_bool("EMAIL_SSL", False)
+# Отправка 2FA-кодов через Supabase Auth (email от @supabase.co)
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 # Публичный адрес сайта (для ссылок в админке), напр. http://1.2.3.4:8000
 PUBLIC_URL = os.getenv("PUBLIC_URL", "").rstrip("/")
 # Название проекта / issuer для TOTP
