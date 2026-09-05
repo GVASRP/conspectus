@@ -75,6 +75,9 @@
   </div>
 
   <script src="/static/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(function () {}); }
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

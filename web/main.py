@@ -5,7 +5,7 @@ import traceback
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -22,6 +22,15 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, max_age=7 * 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 app.state.diag = {}
+
+
+@app.get("/sw.js", include_in_schema=False)
+async def service_worker():
+    return FileResponse(
+        str(BASE_DIR / "static" / "sw.js"),
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache"},
+    )
 
 
 @app.get("/__diag")
