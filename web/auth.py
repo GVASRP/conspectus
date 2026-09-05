@@ -64,6 +64,11 @@ async def login_post(
         return _render(request, "login.html", {"error": "Заявка ещё ожидает одобрения. Зайди позже."})
     request.session["login_uid"] = user.id
     request.session["login_name"] = user.username
+    if not config.WEB_REQUIRE_2FA:
+        request.session["user_id"] = user.id
+        request.session.pop("login_uid", None)
+        request.session.pop("login_name", None)
+        return RedirectResponse("/", status_code=303)
     if not user.email:
         return RedirectResponse("/login/email", status_code=303)
     ok = await _start_2fa(db, request, user)

@@ -42,6 +42,8 @@ ADMIN_TG_ID = os.getenv("ADMIN_TG_ID", "")
 # Отправка 2FA-кодов через Supabase Auth (email от @supabase.co)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+# Вход только логин+пароль без почтового кода. Вернуть 2FA: WEB_REQUIRE_2FA=true
+WEB_REQUIRE_2FA = get_bool("WEB_REQUIRE_2FA", False)
 # Публичный адрес сайта (для ссылок в админке), напр. http://1.2.3.4:8000
 PUBLIC_URL = os.getenv("PUBLIC_URL", "").rstrip("/")
 # Название проекта / issuer для TOTP
