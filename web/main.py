@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.sessions import SessionMiddleware
 
 from app import config
@@ -69,6 +70,49 @@ async def forbidden(request: Request, exc: Forbidden):
 @app.exception_handler(404)
 async def not_found(request: Request, exc):
     return deps.templates.TemplateResponse(request, "404.html", {}, status_code=404)
+
+
+def _error_page(title: str, text: str) -> str:
+    return f"""<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title} · Conspectus</title>
+<style>
+body{{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+background:#0f1420;color:#e8ecf5;font:16px/1.5 system-ui,-apple-system,sans-serif}}
+.card{{max-width:420px;padding:40px;text-align:center}}
+h1{{font-size:22px;margin:0 0 8px}}p{{color:#9aa6bd;margin:0 0 20px}}
+a,button{{display:inline-block;padding:10px 20px;border:none;border-radius:10px;
+background:#4c6ef5;color:#fff;text-decoration:none;cursor:pointer;font-size:15px}}
+</style></head><body><div class="card">
+<h1>{title}</h1><p>{text}</p>
+<button onclick="location.reload()">Обновить страницу</button>
+</div></body></html>"""
+
+
+@app.exception_handler(SQLAlchemyError)
+async def db_error(request: Request, exc: SQLAlchemyError):
+    request.app.state.diag["last_db_error"] = {
+        "ts": __import__("time").strftime("%H:%M:%S"),
+        "error": traceback.format_exc(),
+        "path": request.url.path,
+    }
+    return HTMLResponse(
+        _error_page("База данных временно недоступна", "Соединение с базой прервалось. Попробуй обновить страницу."),
+        status_code=503,
+    )
+
+
+@app.exception_handler(Exception)
+async def internal_error(request: Request, exc: Exception):
+    request.app.state.diag["last_error"] = {
+        "ts": __import__("time").strftime("%H:%M:%S"),
+        "error": traceback.format_exc(),
+        "path": request.url.path,
+    }
+    return HTMLResponse(
+        _error_page("Ошибка сервера", "Что-то пошло не так. Попробуй ещё раз."),
+        status_code=500,
+    )
 
 
 @app.on_event("startup")

@@ -2,6 +2,7 @@ import hashlib
 import os
 import secrets
 import ssl as _ssl
+import time
 from base64 import b64decode, b64encode
 from datetime import datetime, timedelta
 
@@ -254,10 +255,20 @@ if DATABASE_URL:
     # Supabase pooler требует TLS, но у многоклиентского пулера (Supavisor)
     # в цепочке свой self-signed root, который не проходит проверку штатными CA.
     # Оставляем шифрование канала, верификацию цепочки отключаем (аналог sslmode=require).
+    # Пул держим минимальным: на serverless у каждого lambda-инстанса свой пул,
+    # а пулер (Supavisor session mode) ограничен 15 клиентами — большой пул
+    # на нескольких инстансах выбивает лимит и весь сайт ловит 500 (EMAXCONNSESSION).
     _tls = _ssl.create_default_context()
     _tls.check_hostname = False
     _tls.verify_mode = _ssl.CERT_NONE
-    engine = create_engine(_url, pool_pre_ping=True, connect_args={"ssl_context": _tls})
+    engine = create_engine(
+        _url,
+        pool_pre_ping=True,
+        pool_size=1,
+        max_overflow=1,
+        pool_timeout=10,
+        connect_args={"ssl_context": _tls, "timeout": 10},
+    )
 else:
     # Без DATABASE_URL — in-memory sqlite (Vercel: файловая система read-only,
     # файла на диске создать нельзя). Данные живут до конца процесса.
@@ -274,7 +285,20 @@ def init_db() -> None:
 
 
 def get_db():
-    db = SessionLocal()
+    """Yields сессию, выживая кратковременные сбои подключения к пулеру.
+    Сначала форсируем подключение, при промахе — пара быстрых ретраев."""
+    attempt = 0
+    while True:
+        db = SessionLocal()
+        try:
+            db.connection()  # пингуем/устанавливаем коннект сейчас
+            break
+        except Exception:  # noqa: BLE001
+            db.close()
+            attempt += 1
+            if attempt >= 3:
+                raise
+            time.sleep(0.25 * attempt)
     try:
         yield db
     finally:
