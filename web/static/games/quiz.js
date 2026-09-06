@@ -21,15 +21,23 @@
   async function load() {
     var feed = G.$("#q-feedback");
     if (feed) feed.textContent = "Ищу вопрос по твоим конспектам…";
+    var hint = G.$("#q-load");
+    if (hint) hint.style.display = "block";
     try {
       var res = await fetch("/api/fun/quiz");
       var data = await res.json();
+      if (hint) hint.style.display = "none";
       if (!data.ok) {
         renderEmpty(data.error);
         return;
       }
+      if (!data.question || !data.question.options || data.question.options.length < 2) {
+        renderEmpty("Пока не хватает вариантов ответа — добавь больше предметов или конспектов.");
+        return;
+      }
       renderQuestion(data.question);
     } catch (e) {
+      if (hint) hint.style.display = "none";
       renderEmpty("Не получилось загрузить вопрос. Попробуй ещё раз.");
     }
   }
@@ -37,11 +45,13 @@
   function renderEmpty(msg) {
     G.hideOverlay(G.$("#quiz-area"));
     var root = G.$("#q-body");
+    if (!root) return;
     root.innerHTML =
       '<div class="quiz-q"><div class="q-sub">· квиз ·</div><div class="q-title">' + msg + "</div>" +
       '<p class="quiz-streak">Загляни в конспекты или добавь новые.</p></div>' +
       '<button class="btn" id="q-again">Ещё раз</button>';
-    G.$("#q-again").addEventListener("click", load);
+    var btn = G.$("#q-again");
+    if (btn) btn.addEventListener("click", load);
   }
 
   function renderQuestion(q) {
@@ -110,7 +120,7 @@
     G.sub("Угадывай, из какого ты предмета видишь конспект. Вопросы берутся из твоих записей.");
     root.innerHTML =
       G.bar(G.stat("Ответы", "0 / 0") + G.stat("Серия", 0) + G.stat("Рекорд", best)) +
-      '<div class="quiz-card"><div id="q-body"></div></div>';
+      '<div class="quiz-card"><div id="q-load" style="text-align:center;color:var(--muted)"></div><div id="q-body"></div></div>';
     load();
   }
 

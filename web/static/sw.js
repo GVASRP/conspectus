@@ -1,5 +1,5 @@
-const CACHE = 'conspectus-v1';
-const RUNTIME = 'conspectus-runtime-v1';
+const CACHE = 'conspectus-v2';
+const RUNTIME = 'conspectus-runtime-v2';
 const PRECACHE = [
   '/',
   '/static/style.css',

@@ -50,12 +50,12 @@ def fun_game(game: str, request: Request, user: User = Depends(require_login)):
 
 @router.get("/api/fun/quiz")
 def quiz_question(request: Request, user: User = Depends(require_login), db: Session = Depends(get_db)):
-    subjects = db.query(Subject).all()
-    if len(subjects) < 2:
-        return JSONResponse({"ok": False, "error": "Нужно минимум два предмета с конспектами."})
-    notes = db.query(Conspect).all()
+    notes = db.query(Conspect).filter(Conspect.subject_id.isnot(None)).all()
     if not notes:
         return JSONResponse({"ok": False, "error": "Конспектов пока нет — добавь что-нибудь, чтобы играть."})
+    subjects = db.query(Subject).filter(Subject.id.in_([n.subject_id for n in notes])).all()
+    if len(subjects) < 2:
+        return JSONResponse({"ok": False, "error": "Нужно минимум два предмета с конспектами, а пока один."})
     note = random.choice(notes)
     correct = note.subject
     distractors = random.sample([s for s in subjects if s.id != correct.id], min(3, len(subjects) - 1))
