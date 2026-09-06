@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} · Комната {{ room_code }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/games/games.css">{% endblock %}
+{% block body %}
+  <div class="ghead room-head reveal in" style="margin-top:40px">
+    <div class="gtitle">
+      <span class="kicker"><span class="dot"></span>Комната <b id="rh-code">{{ room_code or "…" }}</b></span>
+      <h1 id="rh-title">Подключаемся…</h1>
+      <p class="gsub" id="rh-sub"></p>
+    </div>
+    <div class="room-actions">
+      <a class="btn ghost" href="/fun/online">
+        <svg class="bic"><use href="/static/icons.svg#i-arrow-left"/></svg>
+        Лобби
+      </a>
+      <button class="btn ghost" id="rh-leave">Выйти из комнаты</button>
+    </div>
+  </div>
+
+  <div class="gbar room-status reveal in d1" id="room-status"></div>
+
+  <div id="g-root" class="reveal in d2"
+       data-room="{{ room_code }}" data-room-game="{{ game_type or '' }}"></div>
+
+  <div class="gadget copy-box reveal d1" id="code-box" style="display:none">
+    <b style="display:block">Пригласи друга</b>
+    <p class="fact">Код комнаты: <b id="invite-code"></b> — отправь его второму игроку (нужен аккаунт на сайте).</p>
+    <button class="btn xs ghost" id="copy-code">Скопировать код</button>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="/static/games/common.js"></script>
+  <script src="/static/games/sound.js"></script>
+  <script src="/static/games/chess.js"></script>
+  <script src="/static/games/xo.js"></script>
+  <script src="/static/games/tetris.js"></script>
+  <script src="/static/games/online.js"></script>
+  <script>window.addEventListener("DOMContentLoaded", function () {
+    var root = document.getElementById("g-root");
+    G.online.init(root, root.dataset.room);
+  });</script>
+{% endblock %}

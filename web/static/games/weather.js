@@ -128,7 +128,7 @@
         b.textContent = it.name + (it.admin1 ? ", " + it.admin1 : "") + (it.country ? ", " + it.country : "");
         b.addEventListener("click", function () {
           res.innerHTML = "";
-          showWeather({ name: it.name, lat: it.lat, lon: it.lon });
+          showWeather({ name: it.name, lat: it.latitude, lon: it.longitude });
         });
         res.appendChild(b);
       });

@@ -103,6 +103,22 @@ class EmailCode(Base):
     user = relationship("User", back_populates="email_codes")
 
 
+class GameRoom(Base):
+    """Комната сетевой игры (шахматы / крестики-нолики / тетрис-гонка)."""
+    __tablename__ = "game_rooms"
+
+    id = Column(Integer, primary_key=True)
+    code = Column(String(8), unique=True, nullable=False, index=True)
+    game_type = Column(String(12), nullable=False)   # chess | xo | tetris
+    host_id = Column(Integer, nullable=False, index=True)
+    guest_id = Column(Integer, nullable=True)        # может совпадать с host_id (тест в двух вкладках)
+    status = Column(String(12), default="waiting", nullable=False)  # waiting | active | finished
+    state = Column(Text, default="{}", nullable=False)              # JSON-строка
+    winner_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 _PBKDF2_ITER = 200_000
 
 

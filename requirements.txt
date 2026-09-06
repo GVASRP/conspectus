@@ -10,3 +10,4 @@ pyotp
 qrcode
 itsdangerous
 pg8000
+python-chess

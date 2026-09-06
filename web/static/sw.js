@@ -13,12 +13,19 @@ const PRECACHE = [
   '/static/fonts/inter-latin.woff2',
   '/static/games/games.css',
   '/static/games/common.js',
+  '/static/games/sound.js',
   '/static/games/hub.js',
   '/static/games/2048.js',
   '/static/games/snake.js',
   '/static/games/memory.js',
+  '/static/games/tetris.js',
+  '/static/games/minesweeper.js',
+  '/static/games/fifteen.js',
   '/static/games/quiz.js',
   '/static/games/weather.js',
+  '/static/games/online.js',
+  '/static/games/chess.js',
+  '/static/games/xo.js',
 ];
 
 self.addEventListener('install', (e) => {

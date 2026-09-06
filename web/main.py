@@ -11,7 +11,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app import config
 from app.db import SessionLocal, init_db, seed_users
-from web import admin, auth, content, deps, fun
+from web import admin, auth, content, deps, fun, online
 from web.deps import Forbidden, NotAuthed
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -90,3 +90,4 @@ app.include_router(auth.router)
 app.include_router(content.router)
 app.include_router(admin.router)
 app.include_router(fun.router)
+app.include_router(online.router)

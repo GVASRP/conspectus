@@ -20,6 +20,9 @@
         '2048': ['Складывай плитки', '🧮', 'g-g'],
         'snake': ['Классика на клетках', '🐍', 'g-p'],
         'memory': ['Найди все пары', '🧠', 'g-r'],
+        'tetris': ['Собирай линии', '🟦', 'g-t'],
+        'minesweeper': ['Не наступи на мину!', '💣', 'g-w'],
+        'fifteen': ['Собери порядок 1…15', '🔢', 'g-b'],
         'quiz': ['Угадай предмет', '🎯', 'g-w'],
         'weather': ['Погода на сегодня', '🌦️', 'g-b'],
       } %}
@@ -34,6 +37,17 @@
       </a>
     {% endfor %}
   </div>
+
+  <a class="online-banner reveal in d2" href="/fun/online">
+    <span class="ob-ico"><svg class="icon" style="width:22px;height:22px"><use href="/static/icons.svg#i-gamepad"/></svg></span>
+    <span class="ob-box">
+      <b>Играть по сети</b>
+      <span class="ob-sub">Шахматы · Крестики-нолики · Тетрис-гонка — создай комнату и кинь другу код</span>
+    </span>
+    <span class="f-go">В лобби
+      <svg class="icon" style="width:15px;height:15px"><use href="/static/icons.svg#i-arrow-right"/></svg>
+    </span>
+  </a>
 
   <div class="shot reveal">
     <h2>Мелкие радости <span class="snum">4</span></h2>
@@ -84,5 +98,7 @@
   </div>
 {% endblock %}
 {% block scripts %}
+  <script src="/static/games/common.js"></script>
+  <script src="/static/games/sound.js"></script>
   <script src="/static/games/hub.js"></script>
 {% endblock %}

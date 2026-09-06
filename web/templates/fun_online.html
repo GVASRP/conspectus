@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ APP_NAME }} · Игры по сети{% endblock %}
+{% block head %}<link rel="stylesheet" href="/static/games/games.css">{% endblock %}
+{% block body %}
+  <header class="ghead reveal in" style="margin-top:40px">
+    <div class="gtitle">
+      <span class="kicker"><span class="dot"></span>Играем по сети</span>
+      <h1>Позови друга — но не на пересдачу</h1>
+      <p class="gsub">Создай комнату, отправь другу 5-символьный код — и играйте в шахматы, крестики-нолики или тетрис-гонку. Друг должен быть зарегистрирован на сайте.</p>
+    </div>
+    <a class="btn ghost" href="/fun">
+      <svg class="bic"><use href="/static/icons.svg#i-gamepad"/></svg>
+      К развлечениям
+    </a>
+  </header>
+
+  <div class="shot reveal"><h2>Создать комнату <span class="snum">3</span></h2></div>
+
+  <div class="fun-grid reveal in d1">
+    <a class="fun-card g-t s-item" href="/fun/online/game?game=chess">
+      <span class="f-ce">♞</span><span class="f-name">Шахматы</span>
+      <span class="f-desc">2 игрока · ход за ходом</span>
+      <span class="f-go">Создать</span>
+    </a>
+    <a class="fun-card g-g s-item" href="/fun/online/game?game=xo">
+      <span class="f-ce">⭕</span><span class="f-name">Крестики-нолики</span>
+      <span class="f-desc">2 игрока · быстро</span>
+      <span class="f-go">Создать</span>
+    </a>
+    <a class="fun-card g-r s-item" href="/fun/online/game?game=tetris">
+      <span class="f-ce">⬇</span><span class="f-name">Тетрис-гонка</span>
+      <span class="f-desc">Кто быстрее на 20 линий</span>
+      <span class="f-go">Создать</span>
+    </a>
+  </div>
+
+  <div class="shot reveal"><h2>Или войти по коду</h2></div>
+  <div class="gadget join-box reveal d1" style="max-width:520px">
+    <form class="join-form" id="join-form">
+      <input type="text" id="join-code" class="join-code" placeholder="Код комнаты (например KN4P2)" maxlength="6" autocomplete="off">
+      <button class="btn" type="submit">Присоединиться</button>
+    </form>
+    <p class="fact" id="join-msg"></p>
+  </div>
+
+  {% if open_rooms %}
+  <div class="shot reveal"><h2>Открытые комнаты <span class="snum">{{ open_rooms|length }}</span></h2></div>
+  <div class="room-list reveal d1">
+    {% for r in open_rooms %}
+    <a class="room-row" href="/fun/online/game?code={{ r.code }}" data-game-type="{{ r.game_type }}">
+      <span class="rr-ico">{{ {'chess':'♞','xo':'⭕','tetris':'⬇'}[r.game_type] }}</span>
+      <span class="rr-main">
+        <b>{{ r.game_name }}</b>
+        <span class="rr-sub">Создал(а): {{ r.host }} · код <b>{{ r.code }}</b></span>
+      </span>
+      <span class="btn xs ghost">Войти</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if mine %}
+  <div class="shot reveal"><h2>Мои партии</h2></div>
+  <div class="room-list reveal d1">
+    {% for r in mine %}
+    <a class="room-row" href="/fun/online/game?code={{ r.code }}" data-game-type="{{ r.game_type }}">
+      <span class="rr-ico">{{ {'chess':'♞','xo':'⭕','tetris':'⬇'}[r.game_type] }}</span>
+      <span class="rr-main">
+        <b>{{ r.game_name }}</b>
+        <span class="rr-sub">{{ r.status_label }} · код <b>{{ r.code }}</b></span>
+      </span>
+      <span class="btn xs ghost">Вернуться</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="gsub reveal" style="margin-top:26px;max-width:560px">
+    💡 Подсказка: чтобы проверить вдвоём себя или с ботом-вторым окном, создай комнату и зайди в неё
+    вторым игроком из окна в режиме инкогнито (или просто второй вкладкой с другим аккаунтом).
+  </p>
+{% endblock %}
+{% block scripts %}
+  <script src="/static/games/common.js"></script>
+  <script src="/static/games/sound.js"></script>
+  <script>
+    (function () {
+      var form = document.getElementById("join-form");
+      var input = document.getElementById("join-code");
+      var msg = document.getElementById("join-msg");
+      if (form && input) {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var code = input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+          if (code.length < 4) { msg.textContent = "Код — это 5 символов, например KN4P2."; return; }
+          var fd = new FormData(); fd.append("code", code);
+          fetch("/api/games/join", { method: "POST", body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d.ok) {
+                if (window.G && G.sound) try { G.sound.states.match(); } catch (err) {}
+                window.location.href = "/fun/online/game?code=" + d.code;
+              } else {
+                msg.textContent = d.error || "Не получилось присоединиться.";
+              }
+            })
+            .catch(function () { msg.textContent = "Сеть недоступна, попробуй ещё раз."; });
+        });
+      }
+    })();
+  </script>
+{% endblock %}
