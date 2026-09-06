@@ -1,8 +1,9 @@
-/* Conspectus · шахматы (онлайн-комната) — рендер FEN, выбор хода, рокировка, промоушен */
+/* Conspectus · шахматы — онлайн-комната (рендер FEN) и соло против бота */
 (function () {
   "use strict";
   var G = window.G;
   var GLYPHS = { P: "♟", N: "♞", B: "♝", R: "♜", Q: "♛", K: "♚" };
+  var START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   var state = { ori: "w", my: "w", myTurn: false, legal: [], selected: null, over: false };
   var onMoveCb = null, rootEl = null, boardEl = null;
@@ -163,4 +164,71 @@
     setState: setState,
     onMove: function (cb) { onMoveCb = cb; },
   };
+
+  /* ---------- соло против бота на /fun/play/chess ---------- */
+  function postBot(path, data, done) {
+    var fd = new FormData();
+    Object.keys(data).forEach(function (k) { fd.append(k, data[k]); });
+    fetch(path, { method: "POST", body: fd })
+      .then(function (r) { return r.json(); })
+      .then(done)
+      .catch(function () { done({ ok: false, error: "Сеть недоступна." }); });
+  }
+
+  function bootSolo() {
+    var root = document.getElementById("g-root");
+    if (!root || root.dataset.game !== "chess") return;
+    var myColor = "w";
+    var fen = START_FEN;
+    var busy = false;
+
+    root.innerHTML =
+      G.bar('<span class="hint-row" style="margin:0">Вы — белые. Сходите первым.</span>' +
+        '<button class="btn xm ghost" id="ch-restart">Заново</button>') +
+      '<div class="game-area" style="display:grid;place-items:center" id="chess-solo-wrap"></div>';
+    G.sub("Шахматы с ботом. Ваш ход — белые.");
+    mount(root.querySelector("#chess-solo-wrap"), "host");
+
+    function restart() {
+      fen = START_FEN;
+      G.hideOverlay(root);
+      setState({ fen: fen, my_turn: false, legal: [], over: false });
+      serverTurn("");
+    }
+
+    function showResult(r) {
+      var title, sub;
+      if (r.reason === "Мат") {
+        var meWon = r.winner === "me";
+        title = meWon ? "Шах и мат! Вы выиграли" : "Вам мат";
+        sub = meWon ? "Бот капитулировал." : "Бот оказался сильнее. Реванш?";
+      } else {
+        title = "Ничья";
+        sub = r.reason || "Никто не победил.";
+      }
+      G.overlay(root, title, sub, "Ещё раз", restart);
+    }
+
+    function serverTurn(ucv) {
+      if (busy || state.over) return;
+      busy = true;
+      postBot("/api/bot/chess/move", { fen: fen, uci: ucv || "", color: myColor }, function (r) {
+        busy = false;
+        if (!r.ok) { try { G.sound.states.wrong(); } catch (e) {} return; }
+        fen = r.fen;
+        setState(r);
+        if (r.over) showResult(r);
+      });
+    }
+
+    onMoveCb = function (uci) {
+      // sendMove уже сыграл звук; отправляем ход боту
+      serverTurn(uci);
+    };
+    root.querySelector("#ch-restart").addEventListener("click", restart);
+    serverTurn("");
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootSolo);
+  else bootSolo();
 })();
